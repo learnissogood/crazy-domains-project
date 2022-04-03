@@ -180,7 +180,8 @@ const App = () => {
 		if (network !== 'Polygon Mumbai Testnet') {
 			return (
 				<div className="connect-wallet-container">
-					<p>Please connect to the Polygon Mumbai Testnet</p>
+					<p>Please switch to Polygon Mumbai Testnet</p>
+					<button className='cta-button mint-button' onClick={switchNetwork}>Click here to switch</button>
 			  	</div>
 			);
 		}
