@@ -4,13 +4,16 @@ import linkedinLogo from './assets/linkedin-logo.svg';
 import contractAbi from './utils/contractABI.json';
 
 import { ethers } from "ethers";
+import polygonLogo from './assets/polygonlogo.png';
+import ethLogo from './assets/ethlogo.png';
+import { networks } from './utils/networks';
 
 // Constants
 const LINKEDIN_HANDLE = 'in/juan-cruz-yañez-075488231/';
 const LINKEDIN_LINK = `https://linkedin.com/${LINKEDIN_HANDLE}`;
 
 const tld = ".fresh";
-const CONTRACT_ADDRESS = "0x1b8241b396f1EF17934D8fAaC9E257232Ba48A2E";
+const CONTRACT_ADDRESS = "0xd6D1412e137242880C730B09c159cC6829505601";
 
 const App = () => {
 
@@ -19,6 +22,7 @@ const App = () => {
 
 	const [domain, setDomain] = useState('');
 	const [record, setRecord] = useState('');
+	const [network, setNetwork] = useState('');
 
 	const connectWallet = async () => {
 		try {
@@ -62,6 +66,16 @@ const App = () => {
 		} else {
 			console.log('No authorized account found');
 		}
+
+		const chainId = await ethereum.request({ method: 'eth_chainId' });
+    	setNetwork(networks[chainId]);
+
+    	ethereum.on('chainChanged', handleChainChanged);
+    
+    	// Reload the page when they change networks
+    	function handleChainChanged(_chainId) {
+      	window.location.reload();
+    	}
 	};
 
 	const mintDomain = async () => {
@@ -84,7 +98,7 @@ const App = () => {
 				const contract = new ethers.Contract(CONTRACT_ADDRESS, contractAbi.abi, signer);
 		
 				console.log("Going to pop wallet now to pay gas...")
-				let tx = await contract.register(domain, {value: ethers.utils.parseEther(price)});
+				let tx = await contract.register(domain, {value: ethers.utils.parseEther(price), gasLimit: 4000000});
 				// Wait for the transaction to be mined
 				const receipt = await tx.wait();
 		
@@ -167,6 +181,10 @@ const App = () => {
 				<div className="left">
 				<p className="title"> Fresh Name Service</p>
 				<p className="subtitle">Your immortal API on the blockchain!</p>
+				</div>
+				<div className="right">
+					<img alt="Network logo" className="logo" src={ network.includes("Polygon") ? polygonLogo : ethLogo} />
+					{ currentAccount ? <p> Wallet: {currentAccount.slice(0, 6)}...{currentAccount.slice(-4)} </p> : <p> Not connected </p> }
 				</div>
 			  </header>
 			</div>
